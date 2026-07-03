@@ -1,14 +1,15 @@
 #include "DisplayManager.h"
 
-#include "Version.h"
 #include "Config.h"
+#include "Version.h"
+#include "UIManager.h"
 
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
 // ======================================================
-// OLED Object
+// OLED Display
 // ======================================================
 
 Adafruit_SSD1306 oled(
@@ -25,7 +26,7 @@ Adafruit_SSD1306 oled(
 DisplayManager Display;
 
 // ======================================================
-// Initialize Display
+// Initialize
 // ======================================================
 
 void DisplayManager::begin()
@@ -34,23 +35,19 @@ void DisplayManager::begin()
 
     if (!oled.begin(SSD1306_SWITCHCAPVCC, OLED_I2C_ADDRESS))
     {
-        Serial.println("OLED initialization failed.");
-
         while (true)
         {
             delay(100);
         }
     }
 
-    initialized = true;
+    oled.clearDisplay();
 
-    clear();
+    UI.begin();
 
     showBootScreen();
 }
 
-// ======================================================
-// Update
 // ======================================================
 
 void DisplayManager::update()
@@ -65,19 +62,19 @@ void DisplayManager::showBootScreen()
 {
     oled.clearDisplay();
 
-    oled.setTextColor(SSD1306_WHITE);
+    UI.drawCenteredText(
+        ATLOCK_NAME,
+        12,
+        2
+    );
 
-    oled.setTextSize(2);
-    oled.setCursor(18, 12);
-    oled.println("ATLock");
+    UI.drawCenteredText(
+        ATLOCK_EDITION,
+        34,
+        1
+    );
 
-    oled.setTextSize(1);
-    oled.setCursor(26, 36);
-    oled.println(ATLOCK_EDITION);
-
-    oled.setCursor(34, 52);
-    oled.print("v");
-    oled.print(FW_VERSION);
+    UI.drawProgressBar(100);
 
     oled.display();
 
@@ -85,30 +82,35 @@ void DisplayManager::showBootScreen()
 }
 
 // ======================================================
-// Home Screen
+// Home
 // ======================================================
 
 void DisplayManager::showHomeScreen()
 {
     oled.clearDisplay();
 
-    oled.setTextSize(1);
-    oled.setCursor(0, 0);
-    oled.println("ATLock");
+    UI.drawHeader("ATLock");
 
-    oled.drawLine(0, 10, 127, 10, SSD1306_WHITE);
+    UI.drawCenteredText(
+        "LOCKED",
+        22,
+        2
+    );
 
-    oled.setCursor(20, 24);
-    oled.println("System Ready");
+    UI.drawCenteredText(
+        "Scan Card or PIN",
+        46,
+        1
+    );
 
-    oled.setCursor(8, 48);
-    oled.println("Waiting for Input");
+    UI.drawFooter(
+        "B Admin",
+        "A Lock"
+    );
 
     oled.display();
 }
 
-// ======================================================
-// Locked Screen
 // ======================================================
 
 void DisplayManager::showLockedScreen()
@@ -117,113 +119,135 @@ void DisplayManager::showLockedScreen()
 }
 
 // ======================================================
-// Unlocked Screen
-// ======================================================
 
 void DisplayManager::showUnlockedScreen()
 {
     oled.clearDisplay();
 
-    oled.setTextSize(2);
-    oled.setCursor(12, 20);
-    oled.println("UNLOCKED");
+    UI.drawHeader("ATLock");
+
+    UI.drawCenteredText(
+        "UNLOCKED",
+        22,
+        2
+    );
+
+    UI.drawCenteredText(
+        "Door Open",
+        46,
+        1
+    );
+
+    UI.drawFooter(
+        "B Admin",
+        "A Lock"
+    );
 
     oled.display();
 }
 
 // ======================================================
-// PIN Screen
-// ======================================================
 
-void DisplayManager::showPINScreen(const String &pin)
+void DisplayManager::showPINScreen(const String& pin)
 {
+    UI.drawMessageBox(
+        "PIN",
+        pin
+    );
 }
-
-// ======================================================
-// RFID Screen
-// ======================================================
 
 void DisplayManager::showRFIDScan()
 {
+    UI.drawMessageBox(
+        "RFID",
+        "Present Card"
+    );
 }
-
-// ======================================================
-// Granted
-// ======================================================
 
 void DisplayManager::showAccessGranted()
 {
+    UI.drawMessageBox(
+        "Access",
+        "Granted"
+    );
 }
-
-// ======================================================
-// Denied
-// ======================================================
 
 void DisplayManager::showAccessDenied()
 {
+    UI.drawMessageBox(
+        "Access",
+        "Denied"
+    );
 }
-
-// ======================================================
-// Admin
-// ======================================================
 
 void DisplayManager::showAdminLogin()
 {
+    UI.drawMessageBox(
+        "Admin",
+        "Authenticate"
+    );
 }
 
 void DisplayManager::showAdminMenu()
 {
+    UI.drawMessageBox(
+        "Admin",
+        "Loading..."
+    );
 }
-
-// ======================================================
-// Settings
-// ======================================================
 
 void DisplayManager::showSettings()
 {
+    UI.drawMessageBox(
+        "Settings",
+        "Loading..."
+    );
 }
 
 void DisplayManager::showWiFi()
 {
+    UI.drawMessageBox(
+        "WiFi",
+        "Loading..."
+    );
 }
 
 void DisplayManager::showDiagnostics()
 {
+    UI.drawMessageBox(
+        "Diagnostics",
+        "Loading..."
+    );
 }
 
 void DisplayManager::showLogs()
 {
+    UI.drawMessageBox(
+        "Logs",
+        "Loading..."
+    );
 }
 
 void DisplayManager::showAbout()
 {
+    UI.drawMessageBox(
+        "About",
+        FW_VERSION
+    );
 }
 
-// ======================================================
-// Message Box
 // ======================================================
 
 void DisplayManager::showMessage(
-    const String &title,
-    const String &message)
+    const String& title,
+    const String& message)
 {
-    oled.clearDisplay();
-
-    oled.setTextSize(1);
-
-    oled.setCursor(0, 0);
-    oled.println(title);
-
-    oled.drawLine(0, 10, 127, 10, SSD1306_WHITE);
-
-    oled.setCursor(0, 24);
-    oled.println(message);
-
-    oled.display();
+    UI.drawMessageBox(
+        title,
+        message
+    );
 }
 
-// ======================================================
-// Utility
 // ======================================================
 
 void DisplayManager::clear()
