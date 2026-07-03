@@ -1,23 +1,41 @@
 #include "DoorManager.h"
-
-#include "Pins.h"
+#include "LoggerManager.h"
+#include "ServoManager.h"
+#include "LEDManager.h"
+#include "SoundManager.h"
+#include "StateManager.h"
+#include "Globals.h"
 #include "Config.h"
-
-#include <ESP32Servo.h>
-
-Servo doorServo;
 
 DoorManager Door;
 
+// =====================================================
+// Initialize
+// =====================================================
+
 void DoorManager::begin()
 {
-    doorServo.attach(SERVO_PIN);
+    ServoMgr.begin();
+
+    LEDs.begin();
+
+    Speaker.begin();
 
     lock();
 }
 
+// =====================================================
+// Update
+// =====================================================
+
 void DoorManager::update()
 {
+    ServoMgr.update();
+
+    LEDs.update();
+
+    Speaker.update();
+
     if (!locked)
     {
         if (millis() - unlockTime >= AUTO_LOCK_TIME)
@@ -27,21 +45,53 @@ void DoorManager::update()
     }
 }
 
+// =====================================================
+// Lock Door
+// =====================================================
+
 void DoorManager::lock()
 {
-    doorServo.write(SERVO_LOCK_POSITION);
+    ServoMgr.lock();
+
+    LEDs.locked();
+
+    Speaker.play(Sound::Lock);
+
+    State.setState(SystemState::Home);
 
     locked = true;
+    
+    Logger.log(
+    LogLevel::Info,
+    "Door locked"
+);
 }
+
+// =====================================================
+// Unlock Door
+// =====================================================
 
 void DoorManager::unlock()
 {
-    doorServo.write(SERVO_UNLOCK_POSITION);
+    ServoMgr.unlock();
+
+    LEDs.unlocked();
+
+    Speaker.play(Sound::Unlock);
+
+    State.setState(SystemState::Granted);
 
     unlockTime = millis();
 
     locked = false;
+
+    Logger.log(
+    LogLevel::Info,
+    "Door unlocked"
+);
 }
+
+// =====================================================
 
 bool DoorManager::isLocked() const
 {

@@ -150,10 +150,28 @@ void DisplayManager::showUnlockedScreen()
 
 void DisplayManager::showPINScreen(const String& pin)
 {
-    UI.drawMessageBox(
-        "PIN",
-        pin
+    oled.clearDisplay();
+
+    UI.drawHeader("Enter PIN");
+
+    UI.drawCenteredText(
+        "PIN REQUIRED",
+        16,
+        1
     );
+
+    UI.drawCenteredText(
+        pin,
+        34,
+        2
+    );
+
+    UI.drawFooter(
+        "* Delete",
+        "# Enter"
+    );
+
+    oled.display();
 }
 
 void DisplayManager::showRFIDScan()
@@ -166,18 +184,62 @@ void DisplayManager::showRFIDScan()
 
 void DisplayManager::showAccessGranted()
 {
-    UI.drawMessageBox(
-        "Access",
-        "Granted"
+    oled.clearDisplay();
+
+    UI.drawHeader("ATLock");
+
+    UI.drawCenteredText(
+        "ACCESS",
+        14,
+        1
     );
+
+    UI.drawCenteredText(
+        "GRANTED",
+        30,
+        2
+    );
+
+    UI.drawFooter(
+        "",
+        ""
+    );
+
+    oled.display();
+
+    delay(1000);
+
+    showUnlockedScreen();
 }
 
 void DisplayManager::showAccessDenied()
 {
-    UI.drawMessageBox(
-        "Access",
-        "Denied"
+    oled.clearDisplay();
+
+    UI.drawHeader("ATLock");
+
+    UI.drawCenteredText(
+        "ACCESS",
+        14,
+        1
     );
+
+    UI.drawCenteredText(
+        "DENIED",
+        30,
+        2
+    );
+
+    UI.drawFooter(
+        "",
+        ""
+    );
+
+    oled.display();
+
+    delay(1000);
+
+    showHomeScreen();
 }
 
 void DisplayManager::showAdminLogin()

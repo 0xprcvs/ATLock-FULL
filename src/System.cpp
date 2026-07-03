@@ -1,9 +1,12 @@
 #include "System.h"
-
+#include "LoggerManager.h"
 #include "DisplayManager.h"
 #include "KeypadManager.h"
+#include "AuthenticationManager.h"
+#include "DoorManager.h"
 #include "Globals.h"
 #include "PINManager.h"
+
 #include <Arduino.h>
 
 // ======================================================
@@ -17,6 +20,7 @@ SystemManager System;
 // ======================================================
 
 SystemInfo systemInfo;
+bool enteringPIN = false;
 
 // ======================================================
 // Initialize System
@@ -26,15 +30,26 @@ void SystemManager::begin()
 {
     Serial.begin(115200);
 
-    PIN.begin();
-    
     Display.begin();
 
     Input.begin();
 
+    PIN.begin();
+
+    Auth.begin();
+
+    Door.begin();
+
     systemInfo.systemState = SystemState::Home;
 
     Display.showHomeScreen();
+
+    Logger.begin();
+
+Logger.log(
+    LogLevel::Info,
+    "ATLock Started"
+);
 }
 
 // ======================================================
@@ -43,41 +58,77 @@ void SystemManager::begin()
 
 void SystemManager::update()
 {
+    Input.update();
+
+    Door.update();
+
+    Auth.update();
+
+    Logger.update();
+
     if (Input.available())
-{
-    char key = Input.getKey();
-
-    // Number pressed
-    if (Input.isNumber(key))
     {
-        PIN.addDigit(key);
+        char key = Input.getKey();
 
-        Display.showPINScreen(
-            PIN.masked()
-        );
-    }
+        // -------------------------
+        // HOME MODE
+        // -------------------------
 
-    // Delete
-    else if (Input.isCancel(key))
-    {
-        PIN.backspace();
-
-        Display.showPINScreen(
-            PIN.masked()
-        );
-    }
-
-    // Confirm
-    else if (Input.isConfirm(key))
-    {
-        if (PIN.complete())
+        if (!enteringPIN)
         {
-            Serial.print("Entered PIN: ");
-            Serial.println(PIN.value());
+            if (Input.isConfirm(key))
+            {
+                enteringPIN = true;
 
-            // Authentication comes next
+                PIN.clear();
+
+                Display.showPINScreen(
+                    PIN.masked()
+                );
+            }
+        }
+
+        // -------------------------
+        // PIN ENTRY MODE
+        // -------------------------
+
+        else
+        {
+            if (Input.isNumber(key))
+            {
+                PIN.addDigit(key);
+
+                Display.showPINScreen(
+                    PIN.masked()
+                );
+            }
+
+            else if (Input.isCancel(key))
+            {
+                PIN.backspace();
+
+                Display.showPINScreen(
+                    PIN.masked()
+                );
+            }
+
+            else if (Input.isConfirm(key))
+            {
+                if (PIN.complete())
+                {
+                    Auth.authenticatePIN(
+                        PIN.value()
+                    );
+                }
+
+                PIN.clear();
+
+                enteringPIN = false;
+
+                Display.showHomeScreen();
+            }
         }
     }
-}
+
     Display.update();
 }
