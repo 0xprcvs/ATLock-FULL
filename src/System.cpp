@@ -6,7 +6,8 @@
 #include "DoorManager.h"
 #include "Globals.h"
 #include "PINManager.h"
-
+#include "PreferencesManager.h"
+#include "TempPINManager.h"
 #include <Arduino.h>
 
 // ======================================================
@@ -32,9 +33,13 @@ void SystemManager::begin()
 
     Display.begin();
 
+    PreferencesMgr.begin();
+    
     Input.begin();
 
     PIN.begin();
+
+    TempPINs.begin();
 
     Auth.begin();
 
@@ -63,6 +68,8 @@ void SystemManager::update()
     Door.update();
 
     Auth.update();
+
+    TempPINs.update();
 
     Logger.update();
 
@@ -103,30 +110,54 @@ void SystemManager::update()
                 );
             }
 
-            else if (Input.isCancel(key))
-            {
-                PIN.backspace();
+          else if (Input.isCancel(key))
+{
+    if (PIN.value().length() > 0)
+    {
+        PIN.backspace();
 
-                Display.showPINScreen(
-                    PIN.masked()
-                );
-            }
+        Display.showPINScreen(
+            PIN.masked()
+        );
+    }
+    else
+    {
+        PIN.clear();
 
-            else if (Input.isConfirm(key))
-            {
-                if (PIN.complete())
-                {
-                    Auth.authenticatePIN(
-                        PIN.value()
-                    );
-                }
+        enteringPIN = false;
 
-                PIN.clear();
+        Display.showHomeScreen();
+    }
+}
 
-                enteringPIN = false;
+          else if (Input.isConfirm(key))
+{
+    if (!PIN.complete())
+        return;
 
-                Display.showHomeScreen();
-            }
+    bool success = Auth.authenticatePIN(
+        PIN.value()
+    );
+
+    PIN.clear();
+
+    if (success)
+    {
+        enteringPIN = false;
+
+        Display.showAccessGranted();
+    }
+    else
+    {
+        Display.showAccessDenied();
+
+        delay(1200);
+
+        Display.showPINScreen(
+            PIN.masked()
+        );
+    }
+}
         }
     }
 

@@ -1,14 +1,15 @@
 #include "AuthenticationManager.h"
-
+#include "TempPINManager.h"
 #include "LoggerManager.h"
 #include "DoorManager.h"
 #include "Config.h"
+#include "PreferencesManager.h"
 
 AuthenticationManager Auth;
 
 // Temporary Admin PIN
 // Later this will come from Preferences/NVS.
-static const String ADMIN_PIN = "1234";
+
 
 // =====================================================
 
@@ -58,24 +59,42 @@ bool AuthenticationManager::authenticatePIN(const String& pin)
     return false;
 }
 
-    if (pin == ADMIN_PIN)
+  // Admin PIN (currently 4 digits)
+if (pin.length() == 4)
 {
-    failedAttempts = 0;
+    if (pin == PreferencesMgr.getAdminPIN())
+    {
+        failedAttempts = 0;
 
-    Logger.log(
-        LogLevel::Info,
-        "PIN accepted"
-    );
+        Logger.log(
+            LogLevel::Info,
+            "PIN accepted"
+        );
 
-    Door.unlock();
+        Door.unlock();
 
-    return true;
+        return true;
+    }
 }
 
-    Logger.log(
-    LogLevel::Warning,
-    "Invalid PIN"
-);
+// Temporary PIN (6 digits)
+// TODO: Implement in v0.2.2
+else if (pin.length() == 6)
+{
+    if (TempPINs.exists(pin.c_str()))
+    {
+        failedAttempts = 0;
+
+        Logger.log(
+            LogLevel::Info,
+            "Temporary PIN accepted"
+        );
+
+        Door.unlock();
+
+        return true;
+    }
+}
 
 failedAttempts++;
 

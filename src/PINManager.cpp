@@ -26,7 +26,7 @@ void PINManager::clear()
 
 void PINManager::addDigit(char digit)
 {
-    if(pin.length() >= PIN_LENGTH)
+    if (pin.length() >= MAX_PIN_LENGTH)
         return;
 
     if(digit < '0' || digit > '9')
@@ -48,10 +48,9 @@ void PINManager::backspace()
 // =====================================================
 
 bool PINManager::complete() const
-{
-    return pin.length() == PIN_LENGTH;
-}
-
+    {
+        return pin.length() > 0;
+    }
 // =====================================================
 
 String PINManager::value() const

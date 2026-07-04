@@ -19,6 +19,7 @@ Adafruit_SSD1306 oled(
     -1
 );
 
+
 // ======================================================
 // Global Display Manager
 // ======================================================
@@ -98,10 +99,10 @@ void DisplayManager::showHomeScreen()
     );
 
     UI.drawCenteredText(
-        "Scan Card or PIN",
-        46,
-        1
-    );
+    "Press # or Scan Card",
+    46,
+    1
+);
 
     UI.drawFooter(
         "B Admin",
@@ -155,10 +156,10 @@ void DisplayManager::showPINScreen(const String& pin)
     UI.drawHeader("Enter PIN");
 
     UI.drawCenteredText(
-        "PIN REQUIRED",
-        16,
-        1
-    );
+    "Enter your PIN",
+    16,
+    1
+);
 
     UI.drawCenteredText(
         pin,

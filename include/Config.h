@@ -42,7 +42,7 @@ constexpr uint32_t DISPLAY_SLEEP_TIMEOUT = 10000;
 // -------------------------
 // Authentication
 // -------------------------
-constexpr uint8_t PIN_LENGTH = 4;
+constexpr uint8_t PIN_LENGTH = 6;
 
 constexpr uint8_t MAX_PIN_ATTEMPTS = 5;
 

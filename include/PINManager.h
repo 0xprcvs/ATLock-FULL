@@ -27,7 +27,7 @@ private:
 
     String pin = "";
 
-    static constexpr uint8_t MAX_PIN_LENGTH = 4;
+    static constexpr uint8_t MAX_PIN_LENGTH = 6;
 };
 
 extern PINManager PIN;
