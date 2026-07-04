@@ -4,7 +4,7 @@
 #include "DoorManager.h"
 #include "Config.h"
 #include "PreferencesManager.h"
-
+#include "UserManager.h"
 AuthenticationManager Auth;
 
 // Temporary Admin PIN
@@ -60,40 +60,32 @@ bool AuthenticationManager::authenticatePIN(const String& pin)
 }
 
   // Admin PIN (currently 4 digits)
-if (pin.length() == 4)
+User* user = Users.findByPIN(pin.c_str());
+
+if (user != nullptr)
 {
-    if (pin == PreferencesMgr.getAdminPIN())
-    {
-        failedAttempts = 0;
+    failedAttempts = 0;
 
-        Logger.log(
-            LogLevel::Info,
-            "PIN accepted"
-        );
+    Users.login(user);
 
-        Door.unlock();
+    Logger.log(
+        LogLevel::Info,
+        String(user->username) + " authenticated via PIN"
+    );
 
-        return true;
-    }
+    Door.unlock();
+
+    return true;
 }
 
 // Temporary PIN (6 digits)
 // TODO: Implement in v0.2.2
 else if (pin.length() == 6)
 {
-    if (TempPINs.exists(pin.c_str()))
-    {
-        failedAttempts = 0;
-
-        Logger.log(
-            LogLevel::Info,
-            "Temporary PIN accepted"
-        );
-
-        Door.unlock();
-
-        return true;
-    }
+    Logger.log(
+        LogLevel::Info,
+        "Temporary PIN authentication not implemented"
+    );
 }
 
 failedAttempts++;

@@ -51,7 +51,7 @@ constexpr uint32_t LOCKOUT_TIME = 30000;
 // -------------------------
 // RFID
 // -------------------------
-constexpr uint8_t MAX_USERS = 50;
+constexpr uint8_t MAX_USERS = 20;
 constexpr uint8_t MAX_RFID_CARDS = 100;
 
 // -------------------------

@@ -7,7 +7,7 @@
 #include "Globals.h"
 #include "Config.h"
 #include "DisplayManager.h"
-
+#include "UserManager.h"
 DoorManager Door;
 
 // =====================================================
@@ -93,10 +93,20 @@ void DoorManager::unlock()
 
     locked = false;
 
+    if (Users.currentUser() != nullptr)
+{
     Logger.log(
-    LogLevel::Info,
-    "Door unlocked"
-);
+        LogLevel::Info,
+        String(Users.currentUser()->username) + " unlocked the door"
+    );
+}
+else
+{
+    Logger.log(
+        LogLevel::Info,
+        "Door unlocked"
+    );
+}
 }
 
 // =====================================================

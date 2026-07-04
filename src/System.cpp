@@ -8,6 +8,8 @@
 #include "PINManager.h"
 #include "PreferencesManager.h"
 #include "TempPINManager.h"
+#include "StorageManager.h"
+#include "UserManager.h"
 #include <Arduino.h>
 
 // ======================================================
@@ -32,6 +34,10 @@ void SystemManager::begin()
     Serial.begin(115200);
 
     Display.begin();
+
+    Users.begin();
+
+    Storage.begin();
 
     PreferencesMgr.begin();
     
