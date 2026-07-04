@@ -27,6 +27,11 @@ void AuthenticationManager::update()
         {
             lockedOut = false;
             failedAttempts = 0;
+
+            Logger.log(
+             LogLevel::Info,
+             "PIN lockout ended"
+                        );
         }
     }
 }
@@ -44,7 +49,14 @@ void AuthenticationManager::reset()
 bool AuthenticationManager::authenticatePIN(const String& pin)
 {
     if (lockedOut)
-        return false;
+{
+    Logger.log(
+        LogLevel::Warning,
+        "PIN attempt while locked out"
+    );
+
+    return false;
+}
 
     if (pin == ADMIN_PIN)
 {

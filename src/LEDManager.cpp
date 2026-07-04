@@ -18,7 +18,20 @@ void LEDManager::update()
 
 void LEDManager::setMode(LEDMode mode)
 {
-    currentMode = mode;
+    switch (mode)
+    {
+        case LEDMode::Off:
+            off();
+            break;
+
+        case LEDMode::Locked:
+            locked();
+            break;
+
+        case LEDMode::Unlocked:
+            unlocked();
+            break;
+    }
 }
 
 void LEDManager::off()

@@ -6,6 +6,7 @@
 #include "StateManager.h"
 #include "Globals.h"
 #include "Config.h"
+#include "DisplayManager.h"
 
 DoorManager Door;
 
@@ -51,6 +52,8 @@ void DoorManager::update()
 
 void DoorManager::lock()
 {
+    if (locked)
+    return;
     ServoMgr.lock();
 
     LEDs.locked();
@@ -58,6 +61,7 @@ void DoorManager::lock()
     Speaker.play(Sound::Lock);
 
     State.setState(SystemState::Home);
+    Display.showHomeScreen();
 
     locked = true;
     
@@ -73,6 +77,9 @@ void DoorManager::lock()
 
 void DoorManager::unlock()
 {
+    if (!locked)
+    return;
+
     ServoMgr.unlock();
 
     LEDs.unlocked();
@@ -80,6 +87,7 @@ void DoorManager::unlock()
     Speaker.play(Sound::Unlock);
 
     State.setState(SystemState::Granted);
+    Display.showUnlockedScreen();
 
     unlockTime = millis();
 
