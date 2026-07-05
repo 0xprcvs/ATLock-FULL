@@ -33,6 +33,11 @@ public:
         const char* pin
     );
 
+    bool setUserRFID(
+    const char* username,
+    const char* uid
+);
+
     // Lookup
     User* findByPIN(
         const char* pin

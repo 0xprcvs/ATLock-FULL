@@ -6,10 +6,13 @@
 #include "DoorManager.h"
 #include "Globals.h"
 #include "PINManager.h"
+#include "APIManager.h"
 #include "PreferencesManager.h"
 #include "TempPINManager.h"
 #include "StorageManager.h"
+#include "WiFiManager.h"
 #include "UserManager.h"
+#include "RFIDManager.h"
 #include <Arduino.h>
 
 // ======================================================
@@ -35,9 +38,14 @@ void SystemManager::begin()
 
     Display.begin();
 
+    WiFiMgr.begin();
+
+    API.begin();
+
     Users.begin();
 
     Storage.begin();
+    Storage.loadUsers();
 
     PreferencesMgr.begin();
     
@@ -48,6 +56,7 @@ void SystemManager::begin()
     TempPINs.begin();
 
     Auth.begin();
+    RFID.begin();
 
     Door.begin();
 
@@ -74,6 +83,26 @@ void SystemManager::update()
     Door.update();
 
     Auth.update();
+
+    API.update();
+
+    WiFiMgr.update();
+
+    RFID.update();
+
+if (RFID.available())
+{
+    String uid = RFID.readUID();
+
+    User* user = Users.findByRFID(uid.c_str());
+
+    if (user != nullptr)
+    {
+        Users.login(user);
+
+        Door.unlock();
+    }
+}
 
     TempPINs.update();
 

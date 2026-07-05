@@ -10,9 +10,9 @@ public:
 
     void begin();
 
-    void loadUsers();
-
     void saveUsers();
+
+    void loadUsers();
 
 private:
 

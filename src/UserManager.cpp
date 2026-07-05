@@ -193,3 +193,24 @@ User* UserManager::getUser(
 
     return &users[index];
 }
+
+// =====================================================
+// Set User RFID
+// =====================================================
+
+bool UserManager::setUserRFID(
+    const char* username,
+    const char* uid)
+{
+    for(uint8_t i = 0; i < MAX_USERS; i++)
+    {
+        if(users[i].active &&
+           strcmp(users[i].username, username) == 0)
+        {
+            strcpy(users[i].rfid, uid);
+            return true;
+        }
+    }
+
+    return false;
+}
